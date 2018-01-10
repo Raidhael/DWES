@@ -1,5 +1,5 @@
 <?php
-//ESTO ES UNA PRUEBA  DE GIT
+
 $nombre='';
 $alertNombreCogido ='';
 $alertPass='';
