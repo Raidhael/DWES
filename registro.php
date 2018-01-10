@@ -13,15 +13,17 @@ if (isset($_POST['aceptar']) && $_POST['validar'] == 1) {
     }catch (PDOException $e) {
         echo 'Fallo la conexion '. $e->getMessage();
     }
+//SE ASIGNA LAS VARIABLES RECOGIDAS POR EL FORMULARIO 
     $nombre = $_POST['nombre'];
     $pass = $_POST['pass'];
     $pass1 = $_POST['pass1'];
     $rol = $_POST['rol'];
+//SE CONSULTA QUE EL NOMBRE NO ESTE COGIDO
     $consulta = $conexion->prepare('SELECT count(*) FROM usuario WHERE nombre like :nombre');
     $consulta->bindParam(':nombre',$nombre);
     $consulta->execute();
     $validaNombre = $consulta->fetch(PDO::FETCH_NUM)[0];
-    
+//SI EL NOMBRE ESTA COGIDO SE ALERTARA AL USUARIO Y LE OBLIGARA A ELEGIR OTRO    
     if ($validaNombre != null && $validaNombre > 0) $alertNombreCogido='<span class=alert> *El nombre introducido  ya esta en uso, por favor seleccione otro</span>';
     else{
 
