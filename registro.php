@@ -1,4 +1,5 @@
 <?php
+
 $nombre='';
 $alertNombreCogido ='';
 $alertPass='';
