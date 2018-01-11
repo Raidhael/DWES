@@ -2,7 +2,7 @@
 
 ini_set('session.name','SessionDelBlog');
 session_start();
-require_once('includes/clases/clasebd.inc.php');
+
 $errorAcceso='';
 
 	if (isset($_POST['entrar'])){
