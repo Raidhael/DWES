@@ -19,10 +19,18 @@
 	
 	<a href="index.php"><img src="" alt="logo-blog">
 	<h1> MI BLOG</h1></a>
-	<a href="/index.php"> HOME </a>
-	<a href="../login.php">LOGIN</a>
-	<a href="../registro.php">REGISTRO</a> 
-
+	<a href="/index.php"> Home </a>
+	<?php
+	if (!isset($_SESSION['nombre'])) echo '<a href="login.php">Login</a>';
+	else echo '<a href="/logout.php">Logout</a>'
+	?>
+	
+	<a href="registro.php">Registro</a> 
+	<?php
+		if (isset($_SESSION['nombre'])) echo $_SESSION['nombre'];
+		
+	?>
+	
 	<form action="#" method="POST">
 		Buscar <input type="text" name="busqueda">
 		<input type="radio" name="tipo" value="1" checked >Todas las palabras

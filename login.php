@@ -41,6 +41,7 @@ $errorAcceso='';
 				foreach($resultado as $tipoDeUsuario){
 					if (strcmp($tipoDeUsuario,$rol)== 0){
 						$_SESSION['tipoUsuario'] = $rol;
+						$_SESSION['nombre']=$nombre;
 						header('location: /index.php');
 					}
 				}

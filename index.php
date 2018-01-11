@@ -10,10 +10,30 @@ session_start();
 	<meta charset="UTF-8">
 	<title>Principal</title>
 	<link rel="stylesheet" href="css/estilo.css">
+	<style>
+		.logeadoOk{
+			width: 100%;
+			background-color: blue;
+			text-align: center;
+		}
+		.logeadoOk>a{
+			color:white;
+			font-size: 1.5em;
+		}
+	</style>
 </head>
 <body>
-<a href=""></a>
+
+	
 	<?php
+		if ( isset($_GET['registroCompletado']) && $_GET['registroCompletado'] == 0){
+			echo '<div class="logeadoOk">';
+			echo '<a href="login.php">Ya te puedes logear</a>';
+			echo '</div>';
+		}
+	//Cabecera
+	require_once('includes/cabecera.inc.php');
+	//Alerta de registro completado
 
 		$opc = array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8');
 		try {
@@ -22,6 +42,8 @@ session_start();
 			echo 'Falló la conexión: ' . $e->getMessage();
 		}
 		
+
+		//MUESTRA ENTRADAS
 		$entradasPorPagina = 5;
 		$numeroEntradas = 'SELECT count(*) FROM entrada';
 		$numeroEntradas = $conexion->query($numeroEntradas)->fetch(PDO::FETCH_NUM)[0];
@@ -32,8 +54,9 @@ session_start();
 		$consulta = 'SELECT * FROM entrada ORDER BY fecha ASC LIMIT '.$numeroEntrada.',5;';
 		$entradas = $conexion->query($consulta);
 
-		echo $numeroEntradas .' entradas <br>';
+		
 		echo '<section class ="entradas">';
+		echo $numeroEntradas .' entradas <br>';
 		while (($muestraEntradas = $entradas->fetch(PDO::FETCH_ASSOC)) !=null) {
 			echo '<article>';
 			echo '<h2><a href = " index.php?id='.$muestraEntradas['id'] .'">'.$muestraEntradas['titulo'].'</a></h2>';
@@ -50,14 +73,18 @@ session_start();
 				else $fechaConvertida .=$fecha[$i];
 			}
 			//FIN DE FORMATEO
-
-			echo 'Posteado por : '.$usuario.' el dia  '.$fechaConvertida;
-			$numComentarios = 'SELECT count (*) FROM comentario WHERE idEntrada = '.$muestraEntradas['id'].';';
+			//Nombre de Autor y fecha de posteo
+			echo 'Posteado por: '.$usuario.' <br> Fecha: '.$fechaConvertida;
+			
+			//Enlace a comentarios y numero de comentarios pertenecientes a esa entrada
+			$numComentarios = 'SELECT count(*) FROM comentario WHERE idEntrada ='.$muestraEntradas['id'].';';
 			$numComentarios = $conexion->query($numComentarios)->fetch(PDO::FETCH_NUM)[0];
-			echo '<br><a href = " index.php?id='.$muestraEntradas['id'] .'">'.$numComentarios.'</a>';
+			
+			echo '<br><a href = " index.php?id='.$muestraEntradas['id'] .'#comentarios">Comentarios: '.$numComentarios.'</a>';
 			echo '</article>';
 		}
 		echo "</section>"; 
+		//AQUI ACABA LA MUESTRA DE ENTRADAS 
 	?>
 	
 

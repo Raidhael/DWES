@@ -1,7 +1,7 @@
 <?php
 
 $nombre='';
-$alertNombreCogido ='';
+$errorNombre ='';
 $alertPass='';
 //CONEXION A LA BASE DE DATOS
 if (isset($_POST['aceptar']) && $_POST['validar'] == 1) {
@@ -25,9 +25,9 @@ if (isset($_POST['aceptar']) && $_POST['validar'] == 1) {
     $consulta->execute();
     $validaNombre = $consulta->fetch(PDO::FETCH_NUM)[0];
 //SI EL NOMBRE ESTA COGIDO SE ALERTARA AL USUARIO Y LE OBLIGARA A ELEGIR OTRO    
-    if ($validaNombre != null && $validaNombre > 0) $alertNombreCogido='<span class=alert> *El nombre introducido  ya esta en uso, por favor seleccione otro</span>';
+    if ($validaNombre != null && $validaNombre > 0) $errorNombre='<span class=alert> *El nombre introducido  ya esta en uso, por favor seleccione otro</span>';
     else{
-
+        
         //Expresion regular para validar nombre
         $patronNombre ='/^[A-Za-záéíóúÁÉÍÓÚàèìòùÀÈÌÒÙäÄëËïÏöÖüÜñÑçÇ]{1}[\dA-Za-záéíóúÁÉÍÓÚàèìòùÀÈÌÒÙäÄëËïÏöÖüÜñÑçÇ]{4,24}$/';
         $patronClave = '/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/';//REGLA: Longitud de 8 ademas de al menos un caracter en mayuscula en minuscula y numero, acepta simbolos especiales
@@ -39,6 +39,7 @@ if (isset($_POST['aceptar']) && $_POST['validar'] == 1) {
         //VALIDACION DE CLAVE    
             if (strcmp($pass,$pass1) == 0 && preg_match($patronClave, $pass)) {
                 //ENCRIPTACION DE LA CLAVE 
+                
                     $pass = password_hash($pass,PASSWORD_DEFAULT);
                     
         //VALIDACION DE ROL
@@ -63,13 +64,18 @@ if (isset($_POST['aceptar']) && $_POST['validar'] == 1) {
                     $consulta->bindParam(':clave',$pass);
                     $consulta->bindParam(':rol',$rol);
                     $consulta->execute();
-                    heder('location/index.php?registroCompletado=0');
+                    header('location: /index.php?registroCompletado=0');
+                    exit();
                 }else{
                     header('location: /');
+                    exit();
                 }
             }else {
-                $alertPass=' <span class=alert> * La clave debe contener al menos una mayuscula, una minuscula y un numero</span>';
+                
+                $alertPass=' <span class=alert> * La clave debe minimo 8 caracteres y contener al menos una mayuscula, una minuscula y un numero</span>';
             }        
+        }else{
+            $errorNombre='*El nombre debe contener como minimo 5 caracteres';
         }
     }
 }
@@ -90,7 +96,7 @@ if (isset($_POST['aceptar']) && $_POST['validar'] == 1) {
 ?>
         <form action="#" method="post">
             <label for="nombre">Nombre</label>
-                <input type="text" name="nombre" placeholder="Nombre usuario" value="<?=$nombre?>" id="nombre" ><?=$alertNombreCogido?>
+                <input type="text" name="nombre" placeholder="Nombre usuario" value="<?=$nombre?>" id="nombre" ><?=$errorNombre?>
 
                 <br>
             <label for="pass">Password</label>
