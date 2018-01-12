@@ -25,18 +25,18 @@
 	else echo '<a href="/logout.php">Logout</a>'
 	?>
 	
-	<a href="registro.php">Registro</a> 
+	<a href="registro.php">Registro</a> <br>
 	<?php
 		if (isset($_SESSION['nombre'])) echo $_SESSION['nombre'];
 		
 	?>
 	
-	<form action="#" method="POST">
+	<!--<form action="#" method="POST">
 		Buscar <input type="text" name="busqueda">
 		<input type="radio" name="tipo" value="1" checked >Todas las palabras
 		<input type="radio" name="tipo"  value="2"> Algunas de las palabras
 		<input type="submit" name="enviar" value="Buscar">
-	</form>
+	</form>-->
 	
 
 <?php	
