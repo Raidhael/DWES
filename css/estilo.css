@@ -1,14 +1,14 @@
-section{
+#entradas{
     width:50%;
-    padding:1em;
-    margin-left: 20%;
+    padding:1em;    
+    margin-left:20%;
 }
-aside{
-    width:30%;
+.filtroAnyo{
+    width:15%;
     float:right;
 }
 
-section , aside{
+section , .filtroAnyo{
     vertical-align:top;
     display:inline-block;
 }
@@ -21,7 +21,7 @@ textarea{
 
 .paginacion{
     width: 30%;
-    margin-left: 50%;
+    margin-left:50%;    
     
 }
 
@@ -29,4 +29,13 @@ header{
     margin: auto;
     width: 100%;
     text-align: center;
+}
+.logeadoOk{
+    width: 100%;
+    background-color: blue;
+    text-align: center;
+}
+.logeadoOk>a{
+    color:white;
+    font-size: 1.5em;
 }

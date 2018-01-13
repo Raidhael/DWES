@@ -17,8 +17,8 @@
 
 <header>
 	
-	<a href="index.php"><img src="" alt="logo-blog">
-	<h1> MI BLOG</h1></a>
+	<a href="index.php"><img src="img/ico/example.png" alt="logo-blog">
+	<h1> Example blog</h1></a>
 	<a href="/index.php"> Home </a>
 	<?php
 	if (!isset($_SESSION['nombre'])) echo '<a href="login.php">Login</a>';
@@ -31,12 +31,12 @@
 		
 	?>
 	
-	<!--<form action="#" method="POST">
+	<form action="#" method="POST">
 		Buscar <input type="text" name="busqueda">
 		<input type="radio" name="tipo" value="1" checked >Todas las palabras
 		<input type="radio" name="tipo"  value="2"> Algunas de las palabras
 		<input type="submit" name="enviar" value="Buscar">
-	</form>-->
+	</form>
 	
 
 <?php	
