@@ -19,7 +19,7 @@
 	
 	<a href="index.php"><img src="img/ico/example.png" alt="logo-blog">
 	<h1> Example blog</h1></a>
-	<navbar class="navegacion">
+	<nav class="navegacion">
 	<a href="/index.php"> Home </a>
 	<?php
 	if (!isset($_SESSION['nombre'])) echo '<a href="login.php">Login</a>';
@@ -32,7 +32,7 @@
 	if (isset($_SESSION['nombre']) && strcmp($_SESSION['tipoUsuario'],'administrador')== 0){
 		echo '<a href="listar.php"> Listar (BackEnd)</a><br>';
 	}
-	echo '</navbar>';
+	echo '</nav>';
 		echo '<div class="busqueda">';
 		if (isset($_SESSION['nombre'])) echo '<span class="perfil">Logueado como : '.$_SESSION['nombre'].'</span>';
 		
