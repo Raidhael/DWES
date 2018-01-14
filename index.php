@@ -1,6 +1,7 @@
 <?php
 ini_set('session.name','SessionDelBlog');
 session_start();
+
 ?>
 
 
@@ -21,7 +22,7 @@ session_start();
 		} catch (PDOException $e) {
 			echo 'Falló la conexión: ' . $e->getMessage();
 		}
-
+		//Si se recibe la variable de registro completado se muestra el mensaje de que puede logearse en el portal
 		if ( isset($_GET['registroCompletado']) && $_GET['registroCompletado'] == 0){
 			echo '<div class="logeadoOk">';
 			echo '<a href="login.php">Ya te puedes logear</a>';
@@ -33,12 +34,162 @@ session_start();
 	require_once('includes/aside.inc.php');
 	//Si el año y el mes se han recogido por GET se muestra las entradas pertinentes
 	if (isset($_GET['anno']) && isset($_GET['mes'])){
-		$consulta=$conexion->prepare ('SELECT * FROM entrada WHERE id = :id');
-		$consulta->bindParam(':id',$_GET['id']);
+		//Se comprueba si el valor get no ha sido modificado
+		$consulta=$conexion->prepare ('SELECT count(*) FROM `entrada` WHERE YEAR(fecha)=:anno AND MONTH(fecha)=:mes;');
+		$consulta->bindParam(':anno',$_GET['anno']);
+		$consulta->bindParam(':mes',$_GET['mes']);
 		$consulta->execute();
+		$numeroDeEntradas=$consulta->fetch(PDO::FETCH_NUM)[0];
+		$cuentaEntradas=$numeroDeEntradas;
 
+		//Si no se recibe ningun valor es decir hay 0 filas en la base de datos con ese id, se redirecciona a la pagina principal
+		if ( $numeroDeEntradas == 0){
+			header('location: /');
+			exit();
+		}else {
+		//Si no, se muestra la entrada
+			$entradasPorPagina = 5;
+			if (!isset($_GET['pagina'])) $_GET['pagina']=1;
+			$numeroDeEntradas = ($_GET['pagina'] -1) * $entradasPorPagina;
+			
+			$consulta=$conexion->prepare ('SELECT * FROM `entrada` WHERE YEAR(fecha)=:anno AND MONTH(fecha)=:mes ORDER BY id DESC LIMIT '.$numeroDeEntradas.',5;');
+			$consulta->bindParam(':anno',$_GET['anno']);
+			$consulta->bindParam(':mes',$_GET['mes']);
+			$consulta->execute();
+			$entradas = $consulta;
 
+			
+			echo '<section id="entradas">';
+			echo '<span>'.$cuentaEntradas .' entradas</span> <br>';
+			while (($muestraEntradas = $entradas->fetch(PDO::FETCH_ASSOC)) !=null) {
+				echo '<article>';
+				echo '<h3><a href = " index.php?id='.$muestraEntradas['id'] .'">'.$muestraEntradas['titulo'].'</a></h3>';
+				echo '<p>'.$muestraEntradas['cuerpo'].'</p>';
+				$usuario = 'SELECT nombre FROM usuario WHERE user ='.$muestraEntradas['usuario'].';';
+				$usuario = $conexion->query($usuario)->fetch(PDO::FETCH_NUM)[0];
+				
+				//FORMATO DE FECHA
+				$fecha = $muestraEntradas['fecha'];
+				$fecha = explode('-',$fecha);
+				$fechaConvertida=null;
+				for ($i = count($fecha)-1;$i>=0;$i--){
+					if ($i>0)$fechaConvertida .=$fecha[$i].'/';
+					else $fechaConvertida .=$fecha[$i];
+				}
+				//FIN DE FORMATEO
+				//Nombre de Autor y fecha de posteo
+				echo 'Posteado por: '.$usuario.' <br> Fecha: '.$fechaConvertida;
+				
+				//Enlace a comentarios y numero de comentarios pertenecientes a esa entrada
+				$numComentarios = 'SELECT count(*) FROM comentario WHERE idEntrada ='.$muestraEntradas['id'].';';
+				$numComentarios = $conexion->query($numComentarios)->fetch(PDO::FETCH_NUM)[0];
+				
+				echo '<br><a href = " index.php?id='.$muestraEntradas['id'] .'#comentarios">Comentarios: '.$numComentarios.'</a>';
+				echo '</article>';
+			}
+			echo "</section>"; 
+			//Aqui acaba muestra entradas
+			echo '<div class="paginacion">';
+			$totalPaginas=$numeroDeEntradas / $entradasPorPagina;
 
+			if ($_GET['pagina']!= 1 ){
+					echo '<br>';
+					echo '<a href = "index.php?anno='.$_GET['anno'].'&mes='.$_GET['mes'].'"> &lt;&lt;  </a>';
+					echo '<a href = "index.php?anno='.$_GET['anno'].'&mes='.$_GET['mes'].'&pagina='.($_GET['pagina'] - 1).'"> &lt; </a>';
+				}
+			for ($i = 1 ; $i<=$totalPaginas + 1 ; $i ++ ){
+		
+				if ( $_GET['pagina'] == $i ) echo $i;
+				else echo '<a href="index.php?anno='.$_GET['anno'].'&mes='.$_GET['mes'].'&pagina='.$i.'">'.$i.'</a>';
+			}
+			//ceil para redondear hacia arriba
+		
+			if ($_GET['pagina'] != ceil($totalPaginas) && ceil($totalPaginas) != 0){
+				
+				echo '<a href =" index.php?anno='.$_GET['anno'].'&mes='.$_GET['mes'].'&pagina='.($_GET['pagina'] + 1) .' "> &gt; </a> ';
+				echo '<a href = "index.php?anno='.$_GET['anno'].'&mes='.$_GET['mes'].'&pagina='.ceil($totalPaginas).'"> &gt;&gt; </a>';
+			}
+
+			echo '</div>';
+			//Paginacion
+				}
+	}else if (isset($_GET['anno'])){
+			//Se comprueba si el valor get no ha sido modificado
+			$consulta=$conexion->prepare ('SELECT count(*) FROM `entrada` WHERE YEAR(fecha)=:anno;');
+			$consulta->bindParam(':anno',$_GET['anno']);
+			$consulta->execute();
+			$numeroDeEntradas=$consulta->fetch(PDO::FETCH_NUM)[0];
+			$cuentaEntradas=$numeroDeEntradas;
+	
+			//Si no se recibe ningun valor es decir hay 0 filas en la base de datos con ese id, se redirecciona a la pagina principal
+			if ( $numeroDeEntradas == 0){
+				header('location: /');
+				exit();
+			}else {
+			//Si no, se muestra la entrada
+				$entradasPorPagina = 5;
+				if (!isset($_GET['pagina'])) $_GET['pagina']=1;
+				$numeroDeEntradas = ($_GET['pagina'] -1) * $entradasPorPagina;
+				
+				$consulta=$conexion->prepare ('SELECT * FROM `entrada` WHERE YEAR(fecha)=:anno ORDER BY id DESC LIMIT '.$numeroDeEntradas.',5;');
+				$consulta->bindParam(':anno',$_GET['anno']);
+				$consulta->execute();
+				$entradas = $consulta;
+
+				echo '<span>'.$cuentaEntradas .' entradas</span> <br>';
+				echo '<section id="entradas">';
+				while (($muestraEntradas = $entradas->fetch(PDO::FETCH_ASSOC)) !=null) {
+					echo '<article>';
+					echo '<h3><a href = " index.php?id='.$muestraEntradas['id'] .'">'.$muestraEntradas['titulo'].'</a></h3>';
+					echo '<p>'.$muestraEntradas['cuerpo'].'</p>';
+					$usuario = 'SELECT nombre FROM usuario WHERE user ='.$muestraEntradas['usuario'].';';
+					$usuario = $conexion->query($usuario)->fetch(PDO::FETCH_NUM)[0];
+					
+					//FORMATO DE FECHA
+					$fecha = $muestraEntradas['fecha'];
+					$fecha = explode('-',$fecha);
+					$fechaConvertida=null;
+					for ($i = count($fecha)-1;$i>=0;$i--){
+						if ($i>0)$fechaConvertida .=$fecha[$i].'/';
+						else $fechaConvertida .=$fecha[$i];
+					}
+					//FIN DE FORMATEO
+					//Nombre de Autor y fecha de posteo
+					echo 'Posteado por: '.$usuario.' <br> Fecha: '.$fechaConvertida;
+					
+					//Enlace a comentarios y numero de comentarios pertenecientes a esa entrada
+					$numComentarios = 'SELECT count(*) FROM comentario WHERE idEntrada ='.$muestraEntradas['id'].';';
+					$numComentarios = $conexion->query($numComentarios)->fetch(PDO::FETCH_NUM)[0];
+					
+					echo '<br><a href = " index.php?id='.$muestraEntradas['id'] .'#comentarios">Comentarios: '.$numComentarios.'</a>';
+					echo '</article>';
+				}
+				echo "</section>"; 
+				//Aqui acaba muestra entradas
+				echo '<div class="paginacion">';
+				$totalPaginas=$numeroDeEntradas / $entradasPorPagina;
+	
+				if ($_GET['pagina']!= 1 ){
+						echo '<br>';
+						echo '<a href = "index.php?anno='.$_GET['anno'].'"> &lt;&lt;  </a>';
+						echo '<a href = "index.php?anno='.$_GET['anno'].'&pagina='.($_GET['pagina'] - 1).'"> &lt; </a>';
+					}
+				for ($i = 1 ; $i<=$totalPaginas + 1 ; $i ++ ){
+			
+					if ( $_GET['pagina'] == $i ) echo $i;
+					else echo '<a href="index.php?anno='.$_GET['anno'].'&pagina='.$i.'">'.$i.'</a>';
+				}
+				//ceil para redondear hacia arriba
+			
+				if ($_GET['pagina'] != ceil($totalPaginas) && ceil($totalPaginas) != 0){
+					
+					echo '<a href =" index.php?anno='.$_GET['anno'].'&pagina='.($_GET['pagina'] + 1) .' "> &gt; </a> ';
+					echo '<a href = "index.php?anno='.$_GET['anno'].'&pagina='.ceil($totalPaginas).'"> &gt;&gt; </a>';
+				}
+	
+				echo '</div>';
+				//Paginacion
+			}
 		// Se recibe el id por GET y se muesta la entrada pertinente
 	}else if (isset($_GET['id'])) {
 		//Preparacion de consulta para ver que el id no ha sido modificado 
@@ -76,7 +227,7 @@ session_start();
 					echo '<br><br><a href="index.php"> Atras </a>';
 				}
 			}
-		}else{
+		}else{ 
 
 		//Muestra entradas
 		$entradasPorPagina = 5;
@@ -89,9 +240,9 @@ session_start();
 		$consulta = 'SELECT * FROM entrada ORDER BY id DESC LIMIT '.$numeroEntrada.',5;';
 		$entradas = $conexion->query($consulta);
 
-
-		echo '<span>'.$numeroEntradas .' entradas</span> <br>';
-		
+		//Numero de entradas actuales
+		echo '<span>'.$cuentaEntradas .' entradas</span> <br>';
+		//Datos de las entradas
 		echo '<section id="entradas">';
 		echo '<h4> <a href="index.php#entradas">Novedades </a></h4>';
 		while (($muestraEntradas = $entradas->fetch(PDO::FETCH_ASSOC)) !=null) {
@@ -139,18 +290,12 @@ session_start();
 		}
 		//ceil para redondear hacia arriba
 	
-		if ($_GET['pagina'] != ceil($totalPaginas)){
+		if ($_GET['pagina'] != ceil($totalPaginas) && ceil($totalPaginas) != 0){
 			echo '<a href =" index.php?pagina='.($_GET['pagina'] + 1) .' "> &gt; </a> ';
 			echo '<a href = "index.php?pagina='.ceil($totalPaginas).'"> &gt;&gt; </a>';
 		}
 		echo '</div>';
 	}
-
-	
 	?>
-	
-
-
-
 </body>
 </html>
