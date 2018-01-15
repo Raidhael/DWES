@@ -207,24 +207,37 @@ session_start();
 				$datosEntrada = $consulta->fetch(PDO::FETCH_ASSOC);
 				if ($datosEntrada != null) {
 					echo '<section class="entradas">';
-						echo '<h2><a href = " index.php?id='.$datosEntrada['id'] .'">'.$datosEntrada['titulo'].'</a></h2>';
-						echo '<p>'.$datosEntrada['cuerpo'].'</p>';
-						$usuario = 'SELECT nombre FROM usuario WHERE user ='.$datosEntrada['usuario'].';';
-						$usuario = $conexion->query($usuario)->fetch(PDO::FETCH_NUM)[0];
-						
-						//FORMATO DE FECHA
-						$fecha = $datosEntrada['fecha'];
-						$fecha = explode('-',$fecha);
-						$fechaConvertida=null;
-						for ($i = count($fecha)-1;$i>=0;$i--){
-							if ($i>0)$fechaConvertida .=$fecha[$i].'/';
-							else $fechaConvertida .=$fecha[$i];
-						}
-						//FIN DE FORMATEO
-						//Nombre de Autor y fecha de posteo
-						echo 'Posteado por: '.$usuario.' <br> Fecha: '.$fechaConvertida;
+						echo '<article>';
+							echo '<h3><a href = " index.php?id='.$datosEntrada['id'] .'">'.$datosEntrada['titulo'].'</a></h3>';
+							echo '<p>'.$datosEntrada['cuerpo'].'</p>';
+							$usuario = 'SELECT nombre FROM usuario WHERE user ='.$datosEntrada['usuario'].';';
+							$usuario = $conexion->query($usuario)->fetch(PDO::FETCH_NUM)[0];
+							
+							//FORMATO DE FECHA
+							$fecha = $datosEntrada['fecha'];
+							$fecha = explode('-',$fecha);
+							$fechaConvertida=null;
+							for ($i = count($fecha)-1;$i>=0;$i--){
+								if ($i>0)$fechaConvertida .=$fecha[$i].'/';
+								else $fechaConvertida .=$fecha[$i];
+							}
+							//FIN DE FORMATEO
+							//Nombre de Autor y fecha de posteo
+							echo 'Posteado por: '.$usuario.' <br> Fecha: '.$fechaConvertida;
+						echo '</article>';
 					echo '</section>';
 					echo '<br><br><a href="index.php"> Atras </a>';
+					echo '<div class="comentarios">';
+
+						if (!isset($_SESSION['nombre'])) echo 'Es necesario estar <a href="login.php">logeado</a> para poder comentar esta entrada';
+						else{
+							require_once('comentar.php');
+						}
+
+
+
+
+					echo '</div>';
 				}
 			}
 		}else{ 
@@ -263,7 +276,6 @@ session_start();
 			//FIN DE FORMATEO
 			//Nombre de Autor y fecha de posteo
 			echo 'Posteado por: '.$usuario.' <br> Fecha: '.$fechaConvertida;
-			
 			//Enlace a comentarios y numero de comentarios pertenecientes a esa entrada
 			$numComentarios = 'SELECT count(*) FROM comentario WHERE idEntrada ='.$muestraEntradas['id'].';';
 			$numComentarios = $conexion->query($numComentarios)->fetch(PDO::FETCH_NUM)[0];

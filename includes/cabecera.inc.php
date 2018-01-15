@@ -17,30 +17,31 @@
 
 <header>
 	
-	<a href="index.php"><img src="img/ico/example.png" alt="logo-blog">
+	<a href="/index.php"><img src="/img/ico/example.png" alt="logo-blog">
 	<h1> Example blog</h1></a>
 	<nav class="navegacion">
 	<a href="/index.php"> Home </a>
 	<?php
-	if (!isset($_SESSION['nombre'])) echo '<a href="login.php">Login</a>';
-	else echo '<a href="/logout.php">Logout</a>';
-	?>
+	if (!isset($_SESSION['nombre'])) echo '<a href="login.php">Login</a> <a href="registro.php">Registro</a> ';
 	
-	<a href="registro.php">Registro</a> 
-	<?php
+
 				
 	if (isset($_SESSION['nombre']) && strcmp($_SESSION['tipoUsuario'],'administrador')== 0){
-		echo '<a href="listar.php"> Listar (BackEnd)</a><br>';
+		echo ' BackEnd : <a href="/backend/listar.php"> Listar</a><a href="/backend/editar.php"> Insertar Entrada </a><br>';
 	}
 	echo '</nav>';
 		echo '<div class="busqueda">';
-		if (isset($_SESSION['nombre'])) echo '<span class="perfil">Logueado como : '.$_SESSION['nombre'].'</span>';
+		if (isset($_SESSION['nombre'])) {
+			echo '<span class="perfil">Logueado como : '.$_SESSION['nombre'].'<a href="logout.php"> Salir</a></span>';
+			
+			
+		}
 		
 	?>
 	
 	<form action="#" method="POST">
-		Buscar <input type="text" name="busqueda"><br>
-		<input type="radio" name="tipo" value="1" checked >Todas las palabras<br>
+		Buscar <input type="text" name="busqueda">
+		<input type="radio" name="tipo" value="1" checked >Todas las palabras
 		<input type="radio" name="tipo"  value="2"> Algunas de las palabras
 		<input type="submit" name="enviar" value="Buscar">
 	</form>
