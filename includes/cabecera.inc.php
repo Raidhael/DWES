@@ -32,7 +32,7 @@
 	echo '</nav>';
 		echo '<div class="busqueda">';
 		if (isset($_SESSION['nombre'])) {
-			echo '<span class="perfil">Logueado como : '.$_SESSION['nombre'].'<a href="logout.php"> Salir</a></span>';
+			echo '<span class="perfil">Logueado como : '.$_SESSION['nombre'].'<a href="/logout.php"> Salir</a></span>';
 			
 			
 		}
